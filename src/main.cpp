@@ -1,13 +1,60 @@
-#import <Arduino.h>
+#include <Arduino.h>
+
+int prevPinState;
+int pulseCounter = 0;
+
+//pins
+const int sensorPin = A0;
+const int pulsePin = 13;
+
+// Timing
+unsigned long prevCheck = 0;
+unsigned long prevBlink;
+
+//intervals
+const unsigned long checkInterval = 10;
+const unsigned long blinkInterval = 200;
+
+int pulseState = LOW;
+
+
 
 void setup() {
-  pinMode(13, OUTPUT);  
+  pinMode(sensorPin, INPUT);  
+  pinMode(pulsePin, OUTPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
-  digitalWrite(13, HIGH);
-  delay(300);
-  
-  digitalWrite(13, LOW);
-  delay(700);
+	unsigned long now = millis();
+
+	//check input every 10 ms
+	if(now - prevCheck >= checkInterval) {
+		prevCheck = now;
+		int pinState = analogRead(sensorPin);
+
+		// difference greater than 600
+		if (abs(prevPinState - pinState) > 600) {
+			// 3 when on, 3 when back off = 6 eggs
+			pulseCounter += 3;
+			Serial.println("+3");
+			prevPinState = pinState;
+		}
+	}
+
+	// Handle pulsing 
+	if (pulseCounter > 0 && (now - prevBlink >= blinkInterval)) {
+		prevBlink = now;
+
+		//Toggle counter on rotem
+		pulseState = !pulseState;
+
+		digitalWrite(pulsePin, pulseState);
+
+		if(pulseState == LOW){
+			pulseCounter--;
+		}
+	}
+
+	delay(1);
 }
