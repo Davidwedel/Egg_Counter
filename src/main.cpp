@@ -2,6 +2,7 @@
 
 int prevPinState;
 int pulseCounter = 0;
+int eggsPerCycle = 6;
 
 //pins
 const int sensorPin = A0;
@@ -23,6 +24,7 @@ void setup() {
   pinMode(sensorPin, INPUT);  
   pinMode(pulsePin, OUTPUT);
   Serial.begin(9600);
+  eggsPerCycle = eggsPerCycle / 2;
 }
 
 void loop() {
@@ -36,8 +38,8 @@ void loop() {
 		// difference greater than 600
 		if (abs(prevPinState - pinState) > 600) {
 			// 3 when on, 3 when back off = 6 eggs
-			pulseCounter += 3;
-			Serial.println("+3");
+			pulseCounter += eggsPerCycle;
+			Serial.println(eggsPerCycle);
 			prevPinState = pinState;
 		}
 	}
