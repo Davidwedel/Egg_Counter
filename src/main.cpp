@@ -6,7 +6,8 @@ int eggsPerCycle = 6;
 
 //pins
 const int sensorPin = A0;
-const int pulsePin = 13;
+const int pulsePin = 2;
+const int ledPin = 13;
 
 // Timing
 unsigned long prevCheck = 0;
@@ -23,6 +24,7 @@ int pulseState = LOW;
 void setup() {
   pinMode(sensorPin, INPUT);  
   pinMode(pulsePin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
   Serial.begin(9600);
 }
 
@@ -39,6 +41,13 @@ void loop() {
 			pulseCounter += eggsPerCycle;
 			Serial.println(eggsPerCycle);
 			prevPinState = pinState;
+		}
+
+		// shows status of beam. High beam broken, Low beam shining through
+		if (1023 - pinState < 600) {
+			digitalWrite(ledPin, HIGH);
+		} else {
+			digitalWrite(ledPin, LOW);
 		}
 	}
 
