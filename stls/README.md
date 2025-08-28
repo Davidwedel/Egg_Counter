@@ -1,0 +1,1 @@
+This file contains the files for 3d printing the brackets to hold the laser module and the eye. Import the STLs into your slicer to print them. The freecad design files are located in the freecad_files dir.
