@@ -1,2 +1,4 @@
 .pio
 *.FCBak
+*.gcode
+*.3mf
