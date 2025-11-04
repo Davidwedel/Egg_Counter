@@ -14,7 +14,7 @@ unsigned long prevCheck = 0;
 unsigned long prevBlink;
 
 //intervals
-const unsigned long checkInterval = 10;
+const unsigned long checkInterval = 50;
 const unsigned long blinkInterval = 200;
 
 int pulseState = LOW;
@@ -35,6 +35,7 @@ void loop() {
 	if(now - prevCheck >= checkInterval) {
 		prevCheck = now;
 		int pinState = analogRead(sensorPin);
+		Serial.println(pinState);
 
 		// difference greater than 600
 		if (prevPinState - pinState > 600) {
@@ -44,7 +45,7 @@ void loop() {
 		}
 
 		// shows status of beam. High beam broken, Low beam shining through
-		if (1023 - pinState < 600) {
+		if (1023 - pinState < 800) {
 			digitalWrite(ledPin, HIGH);
 		} else {
 			digitalWrite(ledPin, LOW);
