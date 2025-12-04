@@ -3,27 +3,33 @@
 int prevPinState;
 int pulseCounter = 0;
 int eggsPerCycle = 6;
+unsigned long totalEggs = 0;
+const int beamThreshold = 600;
 
 // pins
 const int sensorPin = A5;
 const int pulsePin = 2;
-const int ledPin = 13;
+const int pulsePin2 = 13;
+const int ledPin = 12;
 
 // Timing
 unsigned long prevCheck = 0;
-unsigned long prevBlink;
+unsigned long prevBlink = 0;
+unsigned long prevDiagnostic = 0;
 
 // intervals
 const unsigned long checkInterval = 50;
-const unsigned long blinkInterval = 200;
+const unsigned long blinkInterval = 50;
+const unsigned long diagnosticInterval = 5000;
 
 int pulseState = LOW;
 
 void setup() {
   pinMode(sensorPin, INPUT);
   pinMode(pulsePin, OUTPUT);
+  pinMode(pulsePin2, OUTPUT);
   pinMode(ledPin, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
   prevPinState = analogRead(sensorPin);
 }
 
@@ -36,22 +42,21 @@ void loop() {
     int pinState = analogRead(sensorPin);
     // Serial.println(pinState);
 
-    // difference greater than 600
+    // difference greater than threshold
     int diff = prevPinState - pinState;
-    Serial.print("diff");
-    Serial.println(diff);
-    if (diff > 600) {
+    // Serial.print("diff");
+    // Serial.println(diff);
+    if (diff > beamThreshold) {
       pulseCounter += eggsPerCycle;
-      Serial.println(eggsPerCycle);
+      totalEggs += eggsPerCycle;
+      // Serial.println(eggsPerCycle);
+      // Serial.println(pulseCounter);
     }
     prevPinState = pinState;
 
     // shows status of beam. High beam broken, Low beam shining through
-    if (1023 - pinState < 800) {
-      digitalWrite(ledPin, HIGH);
-    } else {
-      digitalWrite(ledPin, LOW);
-    }
+    if (abs(diff) > beamThreshold)
+      digitalWrite(ledPin, !digitalRead(ledPin));
   }
 
   // Handle pulsing
@@ -62,10 +67,19 @@ void loop() {
     pulseState = !pulseState;
 
     digitalWrite(pulsePin, pulseState);
+    digitalWrite(pulsePin2, pulseState);
 
     if (pulseState == LOW) {
       pulseCounter--;
+      // Serial.println(pulseCounter);
     }
+  }
+
+  // Diagnostic output every 5 seconds
+  if (now - prevDiagnostic >= diagnosticInterval) {
+    prevDiagnostic = now;
+    Serial.print("Total Eggs: ");
+    Serial.println(totalEggs);
   }
 
   delay(1);

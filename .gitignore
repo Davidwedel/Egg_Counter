@@ -2,3 +2,4 @@
 *.FCBak
 *.gcode
 *.3mf
+*.sw*
