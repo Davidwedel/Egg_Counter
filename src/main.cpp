@@ -9,8 +9,9 @@ const int beamThreshold = 600;
 // pins
 const int sensorPin = A5;
 const int pulsePin = 2;
-const int pulsePin2 = 13;
+const int pulsePin2 = 11;
 const int ledPin = 12;
+const int blinkyPin = 13;
 
 // Timing
 unsigned long prevCheck = 0;
@@ -29,6 +30,7 @@ void setup() {
   pinMode(pulsePin, OUTPUT);
   pinMode(pulsePin2, OUTPUT);
   pinMode(ledPin, OUTPUT);
+  pinMode(blinkyPin, OUTPUT);
   Serial.begin(115200);
   prevPinState = analogRead(sensorPin);
 }
@@ -78,8 +80,27 @@ void loop() {
   // Diagnostic output every 5 seconds
   if (now - prevDiagnostic >= diagnosticInterval) {
     prevDiagnostic = now;
-    Serial.print("Total Eggs: ");
-    Serial.println(totalEggs);
+
+    // Toggle blinkyPin
+    digitalWrite(blinkyPin, HIGH);
+
+    if (Serial) { // Only print if Serial is connected
+      Serial.print("Total Eggs: ");
+      Serial.print(totalEggs);
+      Serial.print(" | pulseCounter: ");
+      Serial.print(pulseCounter);
+      Serial.print(" | uptime: ");
+      unsigned long uptimeSeconds = now / 1000;
+      unsigned long minutes = uptimeSeconds / 60;
+      unsigned long seconds = uptimeSeconds % 60;
+      Serial.print(minutes);
+      Serial.print("m ");
+      Serial.print(seconds);
+      Serial.println("s");
+    }
+
+    delay(100);
+    digitalWrite(blinkyPin, LOW);
   }
 
   delay(1);
